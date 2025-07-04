@@ -36,29 +36,32 @@ const SectionTitle = styled.h2`
 
 const HomePage: React.FC = () => {
   const seoulProperties = properties
-    .filter((p) => p.location.includes("Seoul"))
+    .filter((p) => p.province === "서울")
     .slice(0, 10);
   const busanProperties = properties
-    .filter((p) => p.location.includes("Busan"))
+    .filter((p) => p.province === "부산")
     .slice(0, 10);
   const jejuProperties = properties
-    .filter((p) => p.location.includes("Jeju Island"))
+    .filter((p) => p.province === "제주도")
     .slice(0, 10);
-  const otherPopularProperties = properties
+  const otherPopularProperties = [...properties]
     .filter(
       (p) =>
-        !p.location.includes("Seoul") &&
-        !p.location.includes("Busan") &&
-        !p.location.includes("Jeju Island")
+        p.province !== "서울" &&
+        p.province !== "부산" &&
+        p.province !== "제주도"
     )
+    .sort((a, b) => (b.rating || 0) - (a.rating || 0)) // Sort by rating descending
     .slice(0, 10);
-  const recentlyAddedProperties = properties.slice(40, 50); // Assuming last 10 are recently added
+  const recentlyAddedProperties = [...properties]
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) // Sort by createdAt descending
+    .slice(0, 10);
 
   return (
     <HomePageContainer>
       <Section>
         <SectionTitle>
-          <Link to="/properties/seoul">서울의 인기 숙소</Link>
+          <Link to="/properties/서울">서울의 인기 숙소</Link>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -81,7 +84,7 @@ const HomePage: React.FC = () => {
 
       <Section>
         <SectionTitle>
-          <Link to="/properties/busan">부산의 인기 숙소</Link>
+          <Link to="/properties/부산">부산의 인기 숙소</Link>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -104,7 +107,7 @@ const HomePage: React.FC = () => {
 
       <Section>
         <SectionTitle>
-          <Link to="/properties/jeju island">제주도의 인기 숙소</Link>
+          <Link to="/properties/제주도">제주도의 인기 숙소</Link>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -127,7 +130,7 @@ const HomePage: React.FC = () => {
 
       <Section>
         <SectionTitle>
-          <a href="#">그 외 인기 숙소</a>
+          <Link to="/other-popular-properties">그 외 인기 숙소</Link>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -150,7 +153,7 @@ const HomePage: React.FC = () => {
 
       <Section>
         <SectionTitle>
-          <a href="#">새롭게 등록된 숙소</a>
+          <Link to="/recently-added-properties">새롭게 등록된 숙소</Link>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"

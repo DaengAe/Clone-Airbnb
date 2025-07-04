@@ -18,18 +18,7 @@ const Logo = styled(Link)`
   text-decoration: none;
 `;
 
-const NavMenu = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-`;
 
-const NavItem = styled.div`
-  font-weight: 500;
-  color: #222;
-  cursor: pointer;
-`;
 
 const UserMenu = styled.div`
   display: flex;
@@ -87,7 +76,7 @@ const MenuItem = styled(Link)`
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // 가상의 로그인 상태
+  const [isLoggedIn] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const toggleMenu = () => {
