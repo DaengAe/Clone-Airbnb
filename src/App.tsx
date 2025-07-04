@@ -1,25 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import HeaderAndSearchBarWrapper from "./components/header/HeaderAndSearchBarWrapper";
+import Footer from "./components/footer/Footer";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import SignUpPage from "./pages/SignUpPage";
+import PropertyDetailPage from "./pages/PropertyDetailPage";
+import HostPage from "./pages/HostPage";
+import RegisterPropertyPage from "./pages/RegisterPropertyPage";
+import HelpPage from "./pages/HelpPage";
+import PropertyListPage from "./pages/PropertyListPage";
+import "./App.css";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <HeaderAndSearchBarWrapper />
+      <main>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/property/:id" element={<PropertyDetailPage />} />
+          <Route path="/host" element={<HostPage />} />
+          <Route path="/register-property" element={<RegisterPropertyPage />} />
+          <Route path="/help" element={<HelpPage />} />
+          <Route path="/properties/:location" element={<PropertyListPage />} />
+        </Routes>
+      </main>
+      <Footer />
+    </Router>
   );
 }
 
