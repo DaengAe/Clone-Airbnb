@@ -50,8 +50,8 @@ React + TypeScript 기반의 CSR 방식으로 개발되었으며, 숙소 조회,
 
 1. 이 저장소를 클론합니다.
 ```bash
-git clone https://github.com/yourname/airbnb-clone-frontend.git
-cd airbnb-clone-frontend
+git clone https://github.com/daengae/Clone-Airbnb.git
+cd Clone-Airbnb
 ```
 
 2. 의존성 설치
@@ -124,7 +124,7 @@ Jest & React Testing Library 기반 테스트 코드 작성
 ## 🙋‍♀️ 만든 사람
 | 이름       | 역할                                 |
 |------------|--------------------------------------|
-| YourName | 프론트엔드 개발, UI/UX, 문서 작성           |
+| DaengAe | 프론트엔드 개발, UI/UX, 문서 작성           |
 
 ---
 
