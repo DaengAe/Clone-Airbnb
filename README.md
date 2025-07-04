@@ -32,16 +32,16 @@ React + TypeScript 기반의 CSR 방식으로 개발되었으며, 숙소 조회,
 
 ## 📁 폴더 구조 (예시)
 ```bash
-src/
-├── api/ # Axios 비동기 API 함수 정의
-├── components/ # 재사용 가능한 공통 컴포넌트
-├── pages/ # 라우팅 단위 페이지 컴포넌트
-├── hooks/ # 커스텀 훅
-├── types/ # 전역 타입 정의
-├── utils/ # 유틸 함수
-├── contexts/ # 전역 상태 관리 (Context API)
-├── assets/ # 이미지 및 정적 파일
-└── main.tsx # 앱 진입점
+📦src
+ ┣ 📂api               // Axios 요청 정의
+ ┣ 📂components        // 공통 컴포넌트
+ ┣ 📂pages             // 페이지 컴포넌트 (라우팅 단위)
+ ┣ 📂hooks             // 커스텀 훅
+ ┣ 📂types             // 전역 타입 정의
+ ┣ 📂utils             // 유틸리티 함수
+ ┣ 📂contexts          // 전역 상태 관리
+ ┣ 📂assets            // 이미지, 아이콘 등 정적 파일
+ ┗ 📜main.tsx          // 앱 진입점
 ```
 
 ---
