@@ -1,7 +1,7 @@
-✨ Airbnb 클론 프론트엔드 (React + TypeScript)
+# ✨ Airbnb 클론 프론트엔드 (React + TypeScript)
 Airbnb의 핵심 기능을 클론하여 구현한 웹 애플리케이션입니다. React + TypeScript 기반의 CSR 방식으로 개발되었으며, 숙소 조회, 등록, 댓글, 좋아요 등 핵심 기능을 포함하고 있습니다.
 
-📌 프로젝트 개요
+# 📌 프로젝트 개요
 프로젝트명: Airbnb Clone Frontend
 
 기간: 2025.07.04 ~ 2025.07.20
@@ -10,7 +10,7 @@ Airbnb의 핵심 기능을 클론하여 구현한 웹 애플리케이션입니�
 
 백엔드 연동: REST API 기반(Spring Boot)
 
-⚙️ 사용 기술 스택
+# ⚙️ 사용 기술 스택
 분야 기술
 프레임워크 React (CRA or Vite)
 언어 TypeScript
@@ -20,10 +20,7 @@ HTTP 통신 Axios
 스타일링 CSS Modules, Tailwind CSS or Styled-components
 기타 도구 Prettier, ESLint, GitHub
 
-📁 폴더 구조 (예시)
-less
-복사
-편집
+# 📁 폴더 구조 (예시)
 📦src
 ┣ 📂api // Axios 요청 정의
 ┣ 📂components // 공통 컴포넌트
@@ -34,38 +31,22 @@ less
 ┣ 📂contexts // 전역 상태 관리
 ┣ 📂assets // 이미지, 아이콘 등 정적 파일
 ┗ 📜main.tsx // 앱 진입점
-🚀 실행 방법
-이 저장소를 클론합니다.
 
-bash
-복사
-편집
+# 🚀 실행 방법
+1. 이 저장소를 클론합니다.
 git clone https://github.com/yourname/airbnb-clone-frontend.git
 cd airbnb-clone-frontend
-의존성 설치
 
-bash
-복사
-편집
+2. 의존성 설치
 npm install
 
-# 또는
-
-yarn
-개발 서버 실행
-
-bash
-복사
-편집
+3. 개발 서버 실행
 npm run dev
 
-# 또는
+4. 브라우저에서 확인
+CRA 기준 http://localhost:3000
 
-yarn dev
-브라우저에서 확인
-http://localhost:5173 또는 CRA 기준 http://localhost:3000
-
-🧩 주요 기능
+# 🧩 주요 기능
 기능 설명
 회원가입/로그인 일반 회원, 호스트 회원 구분
 숙소 목록 숙소 카드 형태로 전체 숙소 표시
@@ -75,18 +56,16 @@ http://localhost:5173 또는 CRA 기준 http://localhost:3000
 좋아요 중복 불가, 한 번만 가능. 취소 가능
 반응형 UI 모바일 및 데스크탑 대응
 
-🔐 백엔드 API 연동
+# 🔐 백엔드 API 연동
 API는 Spring Boot로 구성된 백엔드와 연동됩니다.
 
 인증은 JWT 또는 세션 방식으로 구현 예정입니다.
 
 .env 파일에 백엔드 API URL을 설정하세요:
 
-bash
-복사
-편집
 VITE_API_BASE_URL=http://localhost:8080/api
-🛠️ 향후 개선 계획
+
+# 🛠️ 향후 개선 계획
 숙소 검색 및 필터 기능 추가
 
 예약 기능 구현
@@ -97,10 +76,6 @@ Google Maps API 연동
 
 테스트 코드 (Jest, React Testing Library)
 
-📄 라이선스
+# 📄 라이선스
 본 프로젝트는 학습용 클론 코딩 프로젝트이며, 상업적 목적이 아닙니다.
 © 2025 YourName
-
-🙋‍♀️ 만든 사람
-이름 역할
-YourName 프론트엔드 개발, UI/UX, 문서화
