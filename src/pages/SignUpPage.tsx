@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import PasswordInput from "../components/input_form/PasswordInput";
 import CommonInput from "../components/input_form/CommonInput";
+import validationMessages from "../constants/validationMessages";
 
 const SignUpPageContainer = styled.div`
   display: flex;
@@ -55,48 +56,47 @@ const SignUpPage: React.FC = () => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [generalError, setGeneralError] = useState("");
 
   const validateForm = () => {
     let isValid = true;
 
-    // 이름 유효성 검사
     if (name.trim() === "") {
-      setNameError("이름을 입력해주세요.");
+      setNameError(validationMessages.signup.name.blank);
       isValid = false;
     } else {
       setNameError("");
     }
 
-    // 이메일 유효성 검사
     if (email.trim() === "") {
-      setEmailError("이메일을 입력해주세요.");
+      setEmailError(validationMessages.signup.email.blank);
       isValid = false;
     } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
-      setEmailError("유효한 이메일 주소를 입력해주세요.");
+      setEmailError(validationMessages.signup.email.invalid);
       isValid = false;
     } else {
       setEmailError("");
     }
 
-    // 비밀번호 유효성 검사 (영어, 숫자, 특수문자 조합, 8자 이상)
     const passwordRegex =
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
     if (password.length < 8) {
-      setPasswordError("비밀번호는 8자 이상이어야 합니다.");
+      setPasswordError(validationMessages.signup.password.blank);
       isValid = false;
     } else if (!passwordRegex.test(password)) {
-      setPasswordError("비밀번호는 영어, 숫자, 특수문자를 포함해야 합니다.");
+      setPasswordError(validationMessages.signup.password.invalid);
       isValid = false;
     } else {
       setPasswordError("");
     }
 
-    // 비밀번호 확인 유효성 검사
     if (confirmPassword.trim() === "") {
-      setConfirmPasswordError("비밀번호 확인을 입력해주세요.");
+      setConfirmPasswordError(validationMessages.signup.confirmPassword.blank);
       isValid = false;
     } else if (password !== confirmPassword) {
-      setConfirmPasswordError("비밀번호가 일치하지 않습니다.");
+      setConfirmPasswordError(
+        validationMessages.signup.confirmPassword.mismatch
+      );
       isValid = false;
     } else {
       setConfirmPasswordError("");
@@ -105,13 +105,47 @@ const SignUpPage: React.FC = () => {
     return isValid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      console.log("회원가입 성공!", { name, email, password });
-      // 여기에 실제 회원가입 로직을 추가합니다.
-    } else {
-      console.log("회원가입 실패: 유효성 검사 오류");
+    setGeneralError("");
+
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:8080/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password, confirmPassword }),
+      });
+
+      if (response.ok) {
+        alert("회원가입 성공!");
+        // TODO: 회원가입 성공 후 페이지 이동 등 처리
+      } else {
+        const errorData = await response.json();
+
+        // 서버에서 내려준 필드별 에러 메시지를 각 상태에 세팅
+        setNameError(errorData.name || "");
+        setEmailError(errorData.email || "");
+        setPasswordError(errorData.password || "");
+        setConfirmPasswordError(errorData.confirmPassword || "");
+
+        // 필드 에러 없고, 일반 메시지 있을 때
+        if (
+          !errorData.name &&
+          !errorData.email &&
+          !errorData.password &&
+          !errorData.confirmPassword &&
+          errorData.message
+        ) {
+          setGeneralError(errorData.message);
+        }
+      }
+    } catch (error) {
+      setGeneralError("서버와 통신 중 오류가 발생했습니다.");
+      console.error(error);
     }
   };
 
@@ -119,6 +153,8 @@ const SignUpPage: React.FC = () => {
     <SignUpPageContainer>
       <SignUpForm onSubmit={handleSubmit}>
         <Title>회원가입</Title>
+        {generalError && <ErrorMessage>{generalError}</ErrorMessage>}
+
         <CommonInput
           type="text"
           placeholder="이름"
@@ -126,6 +162,7 @@ const SignUpPage: React.FC = () => {
           onChange={(e) => setName(e.target.value)}
         />
         {nameError && <ErrorMessage>{nameError}</ErrorMessage>}
+
         <CommonInput
           type="email"
           placeholder="이메일"
@@ -133,12 +170,14 @@ const SignUpPage: React.FC = () => {
           onChange={(e) => setEmail(e.target.value)}
         />
         {emailError && <ErrorMessage>{emailError}</ErrorMessage>}
+
         <PasswordInput
           placeholder="비밀번호"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
         {passwordError && <ErrorMessage>{passwordError}</ErrorMessage>}
+
         <PasswordInput
           placeholder="비밀번호 확인"
           value={confirmPassword}
@@ -147,6 +186,7 @@ const SignUpPage: React.FC = () => {
         {confirmPasswordError && (
           <ErrorMessage>{confirmPasswordError}</ErrorMessage>
         )}
+
         <Button type="submit">회원가입</Button>
       </SignUpForm>
     </SignUpPageContainer>

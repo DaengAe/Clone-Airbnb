@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import PasswordInput from "../components/input_form/PasswordInput";
 import CommonInput from "../components/input_form/CommonInput";
+import validationMessages from "../constants/validationMessages";
 
 const ErrorMessage = styled.p`
   color: #ff385c;
@@ -51,27 +52,26 @@ const LoginPage: React.FC = () => {
 
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [serverError, setServerError] = useState("");
 
   const validateForm = () => {
     let isValid = true;
 
-    // 이메일 유효성 검사
     if (email.trim() === "") {
-      setEmailError("이메일을 입력해주세요.");
+      setEmailError(validationMessages.login.email.blank);
       isValid = false;
     } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
-      setEmailError("유효한 이메일 주소를 입력해주세요.");
+      setEmailError(validationMessages.login.email.invalid);
       isValid = false;
     } else {
       setEmailError("");
     }
 
-    // 비밀번호 유효성 검사
     if (password.trim() === "") {
-      setPasswordError("비밀번호를 입력해주세요.");
+      setPasswordError(validationMessages.login.password.blank);
       isValid = false;
     } else if (password.length < 8) {
-      setPasswordError("비밀번호는 8자 이상이어야 합니다.");
+      setPasswordError(validationMessages.login.password.tooShort);
       isValid = false;
     } else {
       setPasswordError("");
@@ -80,13 +80,36 @@ const LoginPage: React.FC = () => {
     return isValid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      console.log("로그인 성공!", { email, password });
-      // 여기에 실제 로그인 로직을 추가합니다.
-    } else {
-      console.log("로그인 실패: 유효성 검사 오류");
+    setServerError(""); // 서버 에러 초기화
+
+    if (!validateForm()) return;
+
+    try {
+      const response = await fetch("http://localhost:8080/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // 세션 유지 필수
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        setServerError(errorText || validationMessages.login.fail);
+        return;
+      }
+
+      const data = await response.json();
+      console.log("로그인 성공:", data);
+
+      // 예: 메인 페이지 이동
+      window.location.href = "/";
+    } catch (error) {
+      console.error("로그인 요청 실패:", error);
+      setServerError("서버와 통신 중 문제가 발생했습니다.");
     }
   };
 
@@ -101,12 +124,16 @@ const LoginPage: React.FC = () => {
           onChange={(e) => setEmail(e.target.value)}
         />
         {emailError && <ErrorMessage>{emailError}</ErrorMessage>}
+
         <PasswordInput
           placeholder="비밀번호"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
         {passwordError && <ErrorMessage>{passwordError}</ErrorMessage>}
+
+        {serverError && <ErrorMessage>{serverError}</ErrorMessage>}
+
         <Button type="submit">로그인</Button>
       </LoginForm>
     </LoginPageContainer>
