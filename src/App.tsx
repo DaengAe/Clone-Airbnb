@@ -28,8 +28,14 @@ function App() {
           <Route path="/register-property" element={<RegisterPropertyPage />} />
           <Route path="/help" element={<HelpPage />} />
           <Route path="/properties/:location" element={<PropertyListPage />} />
-          <Route path="/other-popular-properties" element={<OtherPopularPropertiesPage />} />
-          <Route path="/recently-added-properties" element={<RecentlyAddedPropertiesPage />} />
+          <Route
+            path="/other-popular-properties"
+            element={<OtherPopularPropertiesPage />}
+          />
+          <Route
+            path="/recently-added-properties"
+            element={<RecentlyAddedPropertiesPage />}
+          />
         </Routes>
       </main>
       <Footer />

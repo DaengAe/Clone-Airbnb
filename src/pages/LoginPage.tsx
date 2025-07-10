@@ -121,7 +121,8 @@ const LoginPage: React.FC = () => {
       localStorage.setItem("refreshToken", data.refreshToken);
       localStorage.setItem("email", email);
 
-      navigate("/", { replace: true });
+      navigate("/"); // 홈으로 이동
+      window.location.reload(); // 페이지 새로 고침
     } catch (error) {
       console.error("로그인 요청 실패:", error);
       setServerError("서버와 통신 중 문제가 발생했습니다.");
