@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const HeaderContainer = styled.header`
@@ -17,8 +17,6 @@ const Logo = styled(Link)`
   color: #ff385c;
   text-decoration: none;
 `;
-
-
 
 const UserMenu = styled.div`
   display: flex;
@@ -74,10 +72,28 @@ const MenuItem = styled(Link)`
   }
 `;
 
+const MenuButton = styled.div`
+  display: block;
+  padding: 0.8rem 1rem;
+  color: #222;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f7f7f7;
+  }
+`;
+
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // 컴포넌트 마운트 시 localStorage에서 토큰 확인
+    const token = localStorage.getItem("accessToken");
+    setIsLoggedIn(!!token);
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -90,17 +106,51 @@ const Header: React.FC = () => {
   };
 
   useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // React 로그아웃 예시
+  const handleLogout = async () => {
+    try {
+      const email = localStorage.getItem("email");
+      if (!email) {
+        console.warn("email이 없습니다.");
+        return;
+      }
+
+      const response = await fetch("http://localhost:8080/api/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`서버 오류: ${response.status}`);
+      }
+
+      // 클라이언트 토큰 제거
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("email");
+
+      setIsLoggedIn(false); // 로그아웃 상태 반영
+      setIsMenuOpen(false); // 메뉴 닫기
+      navigate("/");
+    } catch (error) {
+      console.error("서버 로그아웃 실패:", error);
+    }
+  };
 
   return (
     <HeaderContainer>
       <Logo to="/">airbnb</Logo>
       <UserMenu ref={menuRef}>
-        <HostLink to="/login">로그인</HostLink>
+        {!isLoggedIn && <HostLink to="/login">로그인</HostLink>}
         <ProfileIcon onClick={toggleMenu}>☰</ProfileIcon>
         {isMenuOpen && (
           <MenuDropdown>
@@ -109,7 +159,8 @@ const Header: React.FC = () => {
                 <MenuItem to="/dashboard">대시보드</MenuItem>
                 <MenuItem to="/messages">메시지</MenuItem>
                 <MenuItem to="/settings">설정</MenuItem>
-                <MenuItem to="/logout">로그아웃</MenuItem>
+                {/* 로그아웃은 일반 링크 대신 클릭 이벤트로 처리 */}
+                <MenuButton onClick={handleLogout}>로그아웃</MenuButton>
               </>
             ) : (
               <>

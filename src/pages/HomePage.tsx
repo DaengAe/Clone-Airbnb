@@ -54,7 +54,10 @@ const HomePage: React.FC = () => {
     .sort((a, b) => (b.rating || 0) - (a.rating || 0)) // Sort by rating descending
     .slice(0, 10);
   const recentlyAddedProperties = [...properties]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) // Sort by createdAt descending
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    ) // Sort by createdAt descending
     .slice(0, 10);
 
   return (
@@ -93,7 +96,7 @@ const HomePage: React.FC = () => {
             viewBox="0 0 16 16"
           >
             <path
-              fill-rule="evenodd"
+              fillRule="evenodd"
               d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"
             />
           </svg>

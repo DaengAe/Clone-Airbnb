@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import PasswordInput from "../components/input_form/PasswordInput";
 import CommonInput from "../components/input_form/CommonInput";
@@ -54,6 +55,16 @@ const LoginPage: React.FC = () => {
   const [passwordError, setPasswordError] = useState("");
   const [serverError, setServerError] = useState("");
 
+  const navigate = useNavigate();
+
+  // 로그인 상태라면 로그인 페이지 접근 불가 -> 홈으로 리다이렉트
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      navigate("/", { replace: true });
+    }
+  }, [navigate]);
+
   const validateForm = () => {
     let isValid = true;
 
@@ -92,7 +103,7 @@ const LoginPage: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // 세션 유지 필수
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
@@ -105,8 +116,12 @@ const LoginPage: React.FC = () => {
       const data = await response.json();
       console.log("로그인 성공:", data);
 
-      // 예: 메인 페이지 이동
-      window.location.href = "/";
+      // 토큰 저장
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
+      localStorage.setItem("email", email);
+
+      navigate("/", { replace: true });
     } catch (error) {
       console.error("로그인 요청 실패:", error);
       setServerError("서버와 통신 중 문제가 발생했습니다.");
