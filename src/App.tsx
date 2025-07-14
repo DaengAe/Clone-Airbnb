@@ -8,10 +8,13 @@ import SignUpPage from "./pages/SignUpPage";
 import PropertyDetailPage from "./pages/PropertyDetailPage";
 import HostPage from "./pages/HostPage";
 import RegisterPropertyPage from "./pages/RegisterPropertyPage";
+import HostRegistrationPage from "./pages/HostRegistrationPage";
 import HelpPage from "./pages/HelpPage";
 import PropertyListPage from "./pages/PropertyListPage";
 import OtherPopularPropertiesPage from "./pages/OtherPopularPropertiesPage";
 import RecentlyAddedPropertiesPage from "./pages/RecentlyAddedPropertiesPage";
+import HostApplicationStatusPage from "./pages/HostApplicationStatusPage";
+import AdminHostRequestsPage from "./pages/AdminHostRequestsPage";
 import "./App.css";
 
 function App() {
@@ -26,6 +29,9 @@ function App() {
           <Route path="/property/:id" element={<PropertyDetailPage />} />
           <Route path="/host" element={<HostPage />} />
           <Route path="/register-property" element={<RegisterPropertyPage />} />
+          <Route path="/host-registration" element={<HostRegistrationPage />} />
+          <Route path="/host-application-status" element={<HostApplicationStatusPage />} />
+          <Route path="/admin/host-requests" element={<AdminHostRequestsPage />} />
           <Route path="/help" element={<HelpPage />} />
           <Route path="/properties/:location" element={<PropertyListPage />} />
           <Route

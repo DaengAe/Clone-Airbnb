@@ -61,11 +61,12 @@ const MenuDropdown = styled.div`
   padding: 0.5rem 0;
 `;
 
-const MenuItem = styled(Link)`
+const MenuItem = styled.div`
   display: block;
   padding: 0.8rem 1rem;
   text-decoration: none;
   color: #222;
+  cursor: pointer;
 
   &:hover {
     background-color: #f7f7f7;
@@ -86,13 +87,16 @@ const MenuButton = styled.div`
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null); // userRole 상태 추가
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 컴포넌트 마운트 시 localStorage에서 토큰 확인
+    // 컴포넌트 마운트 시 localStorage에서 토큰 및 역할 확인
     const token = localStorage.getItem("accessToken");
+    const role = localStorage.getItem("userRole"); // userRole 가져오기
     setIsLoggedIn(!!token);
+    setUserRole(role); // userRole 설정
   }, []);
 
   const toggleMenu = () => {
@@ -125,6 +129,7 @@ const Header: React.FC = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("accessToken")}` // 토큰 추가
         },
         body: JSON.stringify({ email }),
       });
@@ -137,12 +142,18 @@ const Header: React.FC = () => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("email");
+      localStorage.removeItem("userRole"); // userRole 제거
 
       setIsLoggedIn(false); // 로그아웃 상태 반영
+      setUserRole(null); // userRole 초기화
       setIsMenuOpen(false); // 메뉴 닫기
       navigate("/");
     } catch (error) {
-      console.error("서버 로그아웃 실패:", error);
+      if (error instanceof TypeError) {
+        console.error("네트워크 오류: 서버에 연결할 수 없습니다. 서버가 실행 중인지 확인하세요.", error);
+      } else {
+        console.error("서버 로그아웃 실패:", error);
+      }
     }
   };
 
@@ -156,18 +167,27 @@ const Header: React.FC = () => {
           <MenuDropdown>
             {isLoggedIn ? (
               <>
-                <MenuItem to="/dashboard">대시보드</MenuItem>
-                <MenuItem to="/messages">메시지</MenuItem>
-                <MenuItem to="/settings">설정</MenuItem>
+                <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/dashboard"); }}>대시보드</MenuItem>
+                <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/messages"); }}>메시지</MenuItem>
+                {userRole === "ADMIN" && (
+                  <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/admin/host-requests"); }}>호스트 신청 관리</MenuItem>
+                )}
+                {userRole === "USER" && (
+                  <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/host"); }}>호스트 되기</MenuItem>
+                )}
+                {userRole === "HOST" && (
+                  <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/register-property"); }}>숙소 등록</MenuItem>
+                )}
+                <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/settings"); }}>설정</MenuItem>
                 {/* 로그아웃은 일반 링크 대신 클릭 이벤트로 처리 */}
                 <MenuButton onClick={handleLogout}>로그아웃</MenuButton>
               </>
             ) : (
               <>
-                <MenuItem to="/signup">회원가입</MenuItem>
-                <MenuItem to="/login">로그인</MenuItem>
-                <MenuItem to="/host">호스트 되기</MenuItem>
-                <MenuItem to="/help">도움말</MenuItem>
+                <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/signup"); }}>회원가입</MenuItem>
+                <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/login"); }}>로그인</MenuItem>
+                <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/host"); }}>호스트 되기</MenuItem>
+                <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/help"); }}>도움말</MenuItem>
               </>
             )}
           </MenuDropdown>

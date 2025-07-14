@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import PasswordInput from "../components/input_form/PasswordInput";
 import CommonInput from "../components/input_form/CommonInput";
@@ -57,6 +58,16 @@ const SignUpPage: React.FC = () => {
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [generalError, setGeneralError] = useState("");
+
+  const navigate = useNavigate();
+
+  // 로그인 상태라면 회원가입 페이지 접근 불가 -> 홈으로 리다이렉트
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      navigate("/", { replace: true });
+    }
+  }, [navigate]);
 
   const validateForm = () => {
     let isValid = true;
@@ -122,7 +133,7 @@ const SignUpPage: React.FC = () => {
 
       if (response.ok) {
         alert("회원가입 성공!");
-        // TODO: 회원가입 성공 후 페이지 이동 등 처리
+        navigate("/login"); // 로그인 페이지로 이동
       } else {
         const errorData = await response.json();
 

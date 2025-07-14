@@ -1,5 +1,5 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 
 const HostPageContainer = styled.div`
@@ -60,10 +60,21 @@ const Button = styled.button`
 
 const HostPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // useLocation 훅 사용
+
+  // 로그인 상태 확인 및 리다이렉트
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      // 로그인되어 있지 않으면 로그인 페이지로 리다이렉트
+      // 현재 경로를 state로 전달하여 로그인 후 다시 돌아올 수 있도록 함
+      navigate("/login", { state: { from: location.pathname } });
+    }
+  }, [navigate, location]); // navigate와 location을 의존성 배열에 추가
 
   const handleBecomeHost = () => {
     console.log("User is now a host!");
-    navigate("/register-property");
+    navigate("/host-registration");
   };
 
   return (

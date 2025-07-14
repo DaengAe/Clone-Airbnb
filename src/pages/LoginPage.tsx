@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import PasswordInput from "../components/input_form/PasswordInput";
 import CommonInput from "../components/input_form/CommonInput";
@@ -56,6 +56,7 @@ const LoginPage: React.FC = () => {
   const [serverError, setServerError] = useState("");
 
   const navigate = useNavigate();
+  const location = useLocation(); // useLocation 훅 사용
 
   // 로그인 상태라면 로그인 페이지 접근 불가 -> 홈으로 리다이렉트
   useEffect(() => {
@@ -108,8 +109,8 @@ const LoginPage: React.FC = () => {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        setServerError(errorText || validationMessages.login.fail);
+        const errorData = await response.json(); // JSON 파싱
+        setServerError(errorData.error || validationMessages.login.fail); // 'error' 필드 값 사용
         return;
       }
 
@@ -120,8 +121,11 @@ const LoginPage: React.FC = () => {
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
       localStorage.setItem("email", email);
+      localStorage.setItem("userRole", data.role); // 사용자 역할 저장
 
-      navigate("/"); // 홈으로 이동
+      // 이전 페이지 정보가 있다면 해당 페이지로 이동, 없으면 홈으로 이동
+      const from = location.state?.from || "/";
+      navigate(from);
       window.location.reload(); // 페이지 새로 고침
     } catch (error) {
       console.error("로그인 요청 실패:", error);
