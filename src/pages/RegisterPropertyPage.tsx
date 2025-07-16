@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { provinces, citiesByProvince } from '../data/koreanAddresses';
+import { provinces, citiesByProvince } from "../data/koreanAddresses";
+import { useNavigate, useParams } from "react-router-dom"; // Import useParams
 
 const RegisterPropertyPageContainer = styled.div`
   display: flex;
@@ -172,8 +173,6 @@ const Select = styled.select`
   }
 `;
 
-
-
 const RegisterPropertyPage: React.FC = () => {
   const [propertyName, setPropertyName] = useState("");
   const [selectedProvince, setSelectedProvince] = useState("");
@@ -185,6 +184,63 @@ const RegisterPropertyPage: React.FC = () => {
   const [additionalInfo, setAdditionalInfo] = useState(""); // New state for optional info
   const [propertyImages, setPropertyImages] = useState<FileList | null>(null);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+  const navigate = useNavigate(); // Initialize useNavigate
+  const { accommodationId } = useParams<{ accommodationId: string }>(); // Get accommodationId from URL
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    const userRole = localStorage.getItem("userRole");
+
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    if (userRole !== "HOST") {
+      alert("숙소 등록은 호스트만 가능합니다.");
+      navigate("/", { replace: true }); // Redirect to homepage
+      return;
+    }
+
+    // If accommodationId exists in URL, fetch details for editing
+    if (accommodationId) {
+      const fetchAccommodationDetails = async () => {
+        try {
+          const response = await fetch(
+            `http://localhost:8080/api/accommodations/${accommodationId}/details`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            setPropertyName(data.name);
+            setSelectedProvince(data.district);
+            setSelectedCity(data.city);
+            setDetailedAddress(data.detailAddress);
+            setPricePerNight(data.pricePerNight);
+            setNumberOfBedrooms(data.bedroomCount);
+            setAmenities(data.amenities ? data.amenities.split(', ') : []);
+            setAdditionalInfo(data.extraInfo || "");
+            // photoUrls는 현재 파일 객체로 직접 설정할 수 없으므로, 여기서는 처리하지 않습니다.
+            // 실제 구현에서는 이미지 URL을 보여주는 로직이 필요합니다.
+          } else {
+            alert("숙소 정보를 불러오는데 실패했습니다.");
+            navigate("/my-accommodations", { replace: true }); // Redirect to my accommodations list
+          }
+        } catch (error) {
+          console.error("숙소 정보 불러오기 실패:", error);
+          alert("숙소 정보를 불러오는 중 오류가 발생했습니다.");
+          navigate("/my-accommodations", { replace: true });
+        }
+      };
+      fetchAccommodationDetails();
+    }
+  }, [accommodationId, navigate]);
 
   const amenitiesList = [
     "무선 인터넷",
@@ -232,25 +288,70 @@ const RegisterPropertyPage: React.FC = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      console.log({
-        propertyName,
-        selectedProvince,
-        selectedCity,
-        detailedAddress,
-        pricePerNight,
-        numberOfBedrooms,
-        amenities,
-        propertyImages: propertyImages
-          ? Array.from(propertyImages).map((file) => file.name)
-          : [],
-      });
-      alert("숙소가 성공적으로 등록되었습니다!");
-      // Optionally, navigate to a confirmation page or the host's dashboard.
-    } else {
+    setFormErrors({}); // Clear previous errors
+
+    if (!validateForm()) {
       alert("모든 필수 정보를 올바르게 입력해주세요.");
+      return;
+    }
+
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      // This case should ideally be handled by the useEffect above
+      return;
+    }
+
+    // photoUrls는 현재 파일 객체이므로, 실제 URL로 변환하거나 백엔드에서 처리할 수 있는 형태로 변경해야 합니다.
+    // 여기서는 간단히 파일 이름만 보내는 것으로 가정합니다. 실제 구현에서는 파일 업로드 로직이 필요합니다.
+    const photoUrls = propertyImages
+      ? Array.from(propertyImages).map((file) => file.name)
+      : [];
+
+    const requestBody = {
+      name: propertyName,
+      city: selectedCity,
+      district: selectedProvince, // 백엔드 DTO와 일치하도록 수정
+      detailAddress: detailedAddress,
+      pricePerNight: pricePerNight,
+      bedroomCount: numberOfBedrooms,
+      amenities: amenities.join(", "), // 배열을 콤마로 구분된 문자열로 변환
+      extraInfo: additionalInfo,
+      photoUrls: photoUrls,
+    };
+
+    const url = accommodationId
+      ? `http://localhost:8080/api/accommodations/${accommodationId}`
+      : "http://localhost:8080/api/accommodations/register";
+    const method = accommodationId ? "PUT" : "POST";
+
+    try {
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (response.ok) {
+        const registeredAccommodation = await response.json(); // 등록 또는 수정된 숙소 정보 받기
+        alert(
+          `숙소 ${accommodationId ? "수정" : "등록"} 신청이 완료되었습니다. 운영자의 수락을 대기해주세요.`
+        );
+        navigate(`/accommodation-status/${registeredAccommodation.id}`); // 숙소 상태 페이지로 이동
+      } else {
+        const errorData = await response.json();
+        alert(
+          `숙소 ${accommodationId ? "수정" : "등록"} 실패: ${errorData.message || response.statusText}`
+        );
+      }
+    } catch (error) {
+      console.error("숙소 요청 실패:", error);
+      alert("서버와 통신 중 오류가 발생했습니다.");
     }
   };
 

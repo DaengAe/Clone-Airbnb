@@ -15,6 +15,9 @@ import OtherPopularPropertiesPage from "./pages/OtherPopularPropertiesPage";
 import RecentlyAddedPropertiesPage from "./pages/RecentlyAddedPropertiesPage";
 import HostApplicationStatusPage from "./pages/HostApplicationStatusPage";
 import AdminHostRequestsPage from "./pages/AdminHostRequestsPage";
+import AccommodationStatusPage from "./pages/AccommodationStatusPage"; // Import AccommodationStatusPage
+import AdminAccommodationPage from "./pages/AdminAccommodationPage"; // Import AdminAccommodationPage
+import MyAccommodationsPage from "./pages/MyAccommodationsPage"; // Import MyAccommodationsPage
 import "./App.css";
 
 function App() {
@@ -28,10 +31,13 @@ function App() {
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/property/:id" element={<PropertyDetailPage />} />
           <Route path="/host" element={<HostPage />} />
-          <Route path="/register-property" element={<RegisterPropertyPage />} />
+          <Route path="/register-property/:accommodationId?" element={<RegisterPropertyPage />} />
           <Route path="/host-registration" element={<HostRegistrationPage />} />
           <Route path="/host-application-status" element={<HostApplicationStatusPage />} />
           <Route path="/admin/host-requests" element={<AdminHostRequestsPage />} />
+          <Route path="/accommodation-status/:accommodationId" element={<AccommodationStatusPage />} />
+          <Route path="/admin/accommodations" element={<AdminAccommodationPage />} />
+          <Route path="/my-accommodations" element={<MyAccommodationsPage />} /> {/* New route */}
           <Route path="/help" element={<HelpPage />} />
           <Route path="/properties/:location" element={<PropertyListPage />} />
           <Route

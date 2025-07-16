@@ -98,9 +98,17 @@ const HostRegistrationPage: React.FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    console.log("Token from localStorage in HostRegistrationPage:", token);
+    const userRole = localStorage.getItem("userRole"); // userRole 가져오기
+
     if (!token) {
       navigate("/login", { state: { from: "/host-registration" } });
+      return;
+    }
+
+    if (userRole === "HOST") {
+      // 이미 호스트인 경우 메시지 표시 및 폼 숨기기
+      setLoading(false); // 로딩 상태 해제
+      setError("이미 호스트 권한이 있습니다."); // 에러 메시지로 표시
       return;
     }
 
@@ -117,7 +125,6 @@ const HostRegistrationPage: React.FC = () => {
 
         if (response.status === 204) {
           // No host request found, proceed to render the form.
-          // No action needed here, just let the component render the form.
         } else if (response.ok) {
           const data: HostRequestStatusResponse = await response.json();
           if (data.status === "PENDING" || data.status === "APPROVED") {

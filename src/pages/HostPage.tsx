@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 
@@ -37,20 +37,20 @@ const Description = styled.p`
   line-height: 1.6;
 `;
 
-const Button = styled.button`
+const Button = styled.button<{ disabled?: boolean }>`
   padding: 1rem 2.5rem; /* Larger padding for button */
-  background-color: #ff385c;
+  background-color: ${(props) => (props.disabled ? "#ccc" : "#ff385c")};
   color: white;
   border: none;
   border-radius: 25px; /* More rounded button */
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
   font-size: 1.1rem;
   font-weight: 600;
   transition: background-color 0.3s ease, transform 0.3s ease;
 
   &:hover {
-    background-color: #e61e4d;
-    transform: translateY(-2px); /* Slight lift on hover */
+    background-color: ${(props) => (props.disabled ? "#ccc" : "#e61e4d")};
+    transform: ${(props) => (props.disabled ? "none" : "translateY(-2px)")};
   }
   &:focus {
     outline: none;
@@ -60,21 +60,31 @@ const Button = styled.button`
 
 const HostPage: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // useLocation 훅 사용
+  const location = useLocation();
+  const [isHost, setIsHost] = useState(false); // 호스트 여부 상태 추가
 
-  // 로그인 상태 확인 및 리다이렉트
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
+    const userRole = localStorage.getItem("userRole");
+
     if (!token) {
-      // 로그인되어 있지 않으면 로그인 페이지로 리다이렉트
-      // 현재 경로를 state로 전달하여 로그인 후 다시 돌아올 수 있도록 함
       navigate("/login", { state: { from: location.pathname } });
+      return;
     }
-  }, [navigate, location]); // navigate와 location을 의존성 배열에 추가
+
+    if (userRole === "HOST") {
+      setIsHost(true);
+    } else {
+      setIsHost(false);
+    }
+  }, [navigate, location]);
 
   const handleBecomeHost = () => {
-    console.log("User is now a host!");
-    navigate("/host-registration");
+    if (isHost) {
+      navigate("/my-accommodations"); // 호스트인 경우 내 숙소 관리 페이지로 이동
+    } else {
+      navigate("/host-registration"); // 호스트가 아닌 경우 호스트 등록 페이지로 이동
+    }
   };
 
   return (
@@ -82,9 +92,16 @@ const HostPage: React.FC = () => {
       <HostContentWrapper>
         <Title>호스트가 되어보세요</Title>
         <Description>
-          여행객들과 공간을 공유하고 추가 수입을 얻으세요. 시작하기 매우 쉽습니다!
+          {isHost
+            ? "이미 호스트 권한이 있습니다. 숙소를 등록하거나 관리할 수 있습니다."
+            : "여행객들과 공간을 공유하고 추가 수입을 얻으세요. 시작하기 매우 쉽습니다!"}
         </Description>
-        <Button onClick={handleBecomeHost}>시작하기</Button>
+        <Button
+          onClick={handleBecomeHost}
+          disabled={!isHost && !localStorage.getItem("accessToken")}
+        >
+          {isHost ? "내 숙소 관리" : "시작하기"}
+        </Button>
       </HostContentWrapper>
     </HostPageContainer>
   );

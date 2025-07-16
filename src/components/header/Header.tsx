@@ -129,7 +129,7 @@ const Header: React.FC = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("accessToken")}` // 토큰 추가
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // 토큰 추가
         },
         body: JSON.stringify({ email }),
       });
@@ -150,7 +150,10 @@ const Header: React.FC = () => {
       navigate("/");
     } catch (error) {
       if (error instanceof TypeError) {
-        console.error("네트워크 오류: 서버에 연결할 수 없습니다. 서버가 실행 중인지 확인하세요.", error);
+        console.error(
+          "네트워크 오류: 서버에 연결할 수 없습니다. 서버가 실행 중인지 확인하세요.",
+          error
+        );
       } else {
         console.error("서버 로그아웃 실패:", error);
       }
@@ -167,27 +170,101 @@ const Header: React.FC = () => {
           <MenuDropdown>
             {isLoggedIn ? (
               <>
-                <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/dashboard"); }}>대시보드</MenuItem>
-                <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/messages"); }}>메시지</MenuItem>
                 {userRole === "ADMIN" && (
-                  <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/admin/host-requests"); }}>호스트 신청 관리</MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate("/admin/host-requests");
+                    }}
+                  >
+                    호스트 신청 관리
+                  </MenuItem>
+                )}
+                {userRole === "ADMIN" && (
+                  <MenuItem
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate("/admin/accommodations");
+                    }}
+                  >
+                    숙소 등록 관리
+                  </MenuItem>
                 )}
                 {userRole === "USER" && (
-                  <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/host"); }}>호스트 되기</MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate("/host");
+                    }}
+                  >
+                    호스트 되기
+                  </MenuItem>
                 )}
                 {userRole === "HOST" && (
-                  <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/register-property"); }}>숙소 등록</MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate("/register-property");
+                    }}
+                  >
+                    숙소 등록
+                  </MenuItem>
                 )}
-                <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/settings"); }}>설정</MenuItem>
+                {userRole === "HOST" && (
+                  <MenuItem
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate("/my-accommodations");
+                    }}
+                  >
+                    내 숙소 관리
+                  </MenuItem>
+                )}
+                <MenuItem
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate("/settings");
+                  }}
+                >
+                  설정
+                </MenuItem>
                 {/* 로그아웃은 일반 링크 대신 클릭 이벤트로 처리 */}
                 <MenuButton onClick={handleLogout}>로그아웃</MenuButton>
               </>
             ) : (
               <>
-                <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/signup"); }}>회원가입</MenuItem>
-                <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/login"); }}>로그인</MenuItem>
-                <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/host"); }}>호스트 되기</MenuItem>
-                <MenuItem onClick={() => { setIsMenuOpen(false); navigate("/help"); }}>도움말</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate("/signup");
+                  }}
+                >
+                  회원가입
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate("/login");
+                  }}
+                >
+                  로그인
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate("/host");
+                  }}
+                >
+                  호스트 되기
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate("/help");
+                  }}
+                >
+                  도움말
+                </MenuItem>
               </>
             )}
           </MenuDropdown>
